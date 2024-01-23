@@ -1,30 +1,27 @@
-import img from "../../img/Sample_User_Icon.png";
+
 import React, {ChangeEvent, useState} from "react";
-import {app} from "../../firebase";
-import {
-    getDownloadURL,
-    getStorage,
-    ref,
-    uploadBytesResumable,
-} from 'firebase/storage';
+import CaptureImage from './capture.png';
+import testImg from "../../imges/Screenshot (12).png";
+
 import {Simulate} from "react-dom/test-utils";
 import { useSelector } from 'react-redux';
-import error = Simulate.error;
+
 import { useNavigate } from 'react-router-dom';
 const storeImage = async (file: File): Promise<string> => {
     // Your implementation...
     return Promise.resolve(''); // Replace with your actual implementation
 };
 
+
 interface FormData {
-    imageUrls: string[],
+    imgUrl: string[],
     name: '',
     description: '',
     address: '',
     type: 'rent',
-    bedrooms: 1,
-    bathrooms: 1,
-    regularPrice: 50,
+    bedroom: 1,
+    bathroom: 1,
+    regularPricel: 50,
     discountPrice: 0,
     offer: false,
     parking: false,
@@ -36,13 +33,13 @@ export function CreateListingII() {
     // @ts-ignore
     const { currentUser } = useSelector((state) => state.user);
     const [files, setFiles] = React.useState<File[]>([]);
-    const [formData, setFormData] = React.useState<FormData>({ imageUrls: [], name: '',
+    const [formData, setFormData] = React.useState<FormData>({ imgUrl: [], name: '',
         description: '',
         address: '',
         type: 'rent',
-        bedrooms: 1,
-        bathrooms: 1,
-        regularPrice: 50,
+        bedroom: 1,
+        bathroom: 1,
+        regularPricel: 50,
         discountPrice: 0,
         offer: false,
         parking: false,
@@ -54,7 +51,7 @@ export function CreateListingII() {
     let [uploading, setUploading] = useState(false);
     const [error, setError] = useState<any>(false);
     const [loading, setLoading] = useState(false);
-    console.log(formData);
+
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const selectedFiles = e.target.files;
         if (selectedFiles) {
@@ -68,72 +65,86 @@ export function CreateListingII() {
 
 
 
-    const handleImageSubmit = () => {
+    const handleImageSubmit = async () => {
 
-        if (files.length > 0 && files.length  + formData.imageUrls.length < 7) {
+        if (files.length > 0 && files.length  + formData.imgUrl.length < 7) {
             setUploading(true);
             setImageUploadError(false);
             const promises: Promise<string>[] = [];
 
             for (let i = 0; i < files.length; i++) {
-                promises.push(storeImage(files[i]));
+                storeImage(files[i])
+
             }
 
-            Promise.all(promises).then((urls) => {
-                setFormData((prevFormData) => ({
-                    ...prevFormData,
-                    imageUrls: prevFormData.imageUrls.concat(urls),
-                }));
 
-                setImageUploadError(false);
-                setUploading(false)
-            })
-                .catch((err) => {
-                    setImageUploadError("Image size in maximum 10mb");
-                    setUploading(false)
-                });
+
+            // Promise.all(promises).then((urls) => {
+            //     setFormData((prevFormData) => ({
+            //         ...prevFormData,
+            //         imgUrl: prevFormData.imgUrl.concat(urls),
+            //     }));
+            //
+            //     setImageUploadError(false);
+            //     setUploading(false)
+            // })
+            //     .catch((err) => {
+            //         setImageUploadError("Image size in maximum 10mb");
+            //         setUploading(false)
+            //     });
         }else {
-            console.log("else")
+
             setImageUploadError("You can upload only 6 images for listing")
             setFiles([]);
             setUploading(false)
         }
+
     };
+
+
+
 
 
 
     const storeImage = async (file: File) => {
-        return new Promise<string>((resolve, reject) => {
-            const storage = getStorage(app);
-            const fileName = new Date().getTime() + file.name;
-            const storageRef = ref(storage, fileName);
-            const uploadTask = uploadBytesResumable(storageRef, file);
+        var img = new FormData();
+        img.append('img',file);
 
-            uploadTask.on(
-                'state_changed',
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.log(`Upload is ${progress}% done`);
-                },
-                (error) => {
-                    reject(error);
-                },
-                () => {
-                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                        resolve(downloadURL);
-                    });
-                }
-            );
-        });
+        try {
+            const res = await fetch('http://localhost:8080/bootapp/listing/imgSaave', {
+                method: 'POST',
+                body: img,
+            });
+
+            setImageUploadError(false);
+            setUploading(false)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            setFormData({
+                ...formData,
+                imgUrl:formData.imgUrl.concat(file.name),
+            });
+        } catch (errot){
+            setImageUploadError("Image size in maximum 10mb");
+             setUploading(false)
+        }
+
+
+
     };
+
+
+
+
 
 
     // @ts-ignore
     const handleRemoveImage = (index) => {
         setFormData({
             ...formData,
-            imageUrls: formData.imageUrls.filter((_, i) => i !== index),
+            imgUrl: formData.imgUrl.filter((_, i) => i !== index),
         });
+
     };
 
 
@@ -175,17 +186,17 @@ export function CreateListingII() {
         e.preventDefault();
         formData.userRef= currentUser._id
         try {
-            if (formData.imageUrls.length < 1){
+            if (formData.imgUrl.length < 1){
 
                 return setError('You must upload at least one image');
             }
 
 
-            if (+formData.regularPrice < +formData.discountPrice)
+            if (+formData.regularPricel < +formData.discountPrice)
                 return setError('Discount price must be lower than regular price');
             setLoading(true);
             setError(false);
-            const res = await fetch('http://localhost:4000/server/listing/create', {
+            const res = await fetch('http://localhost:8080/bootapp/listing', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -195,24 +206,33 @@ export function CreateListingII() {
 
                 ),
             });
-            console.log(formData.userRef);
+
             const data = await res.json();
             setLoading(false);
             if (data.success === false) {
+
                 setError(data.message);
             }
-            navigate(`/listing/${data._id}`);
+
+            navigate(`/listing/${data.data.id}`);
         } catch (error) {
+            console.log("false eketa awa methana thmeadssaddsd ")
             setError(error);
             setLoading(false);
         }
     };
+
+
+
 
     return (
         <main className='p-3 max-w-4xl mx-auto'>
             <h1 className='text-3xl font-semibold text-center my-7'>
                 Create a Listing
             </h1>
+
+
+
             <form onSubmit={handleSubmit} className='flex flex-col sm:flex-row gap-4'>
                 <div className='flex flex-col gap-4 flex-1'>
                     <input
@@ -301,39 +321,39 @@ export function CreateListingII() {
                         <div className='flex items-center gap-2'>
                             <input
                                 type='number'
-                                id='bedrooms'
+                                id='bedroom'
                                 min='1'
                                 max='10'
                                 required
                                 className='p-3 border border-gray-300 rounded-lg'
                                 onChange={handleChange}
-                                value={formData.bedrooms}
+                                value={formData.bedroom}
                             />
                             <p>Beds</p>
                         </div>
                         <div className='flex items-center gap-2'>
                             <input
                                 type='number'
-                                id='bathrooms'
+                                id='bathroom'
                                 min='1'
                                 max='10'
                                 required
                                 className='p-3 border border-gray-300 rounded-lg'
                                 onChange={handleChange}
-                                value={formData.bathrooms}
+                                value={formData.bathroom}
                             />
                             <p>Baths</p>
                         </div>
                         <div className='flex items-center gap-2'>
                             <input
                                 type='number'
-                                id='regularPrice'
+                                id='regularPricel'
                                 min='50'
                                 max='10000000'
                                 required
                                 className='p-3 border border-gray-300 rounded-lg'
                                 onChange={handleChange}
-                                value={formData.regularPrice}
+                                value={formData.regularPricel}
                             />
                             <div className='flex flex-col items-center'>
                                 <p>Regular price</p>
@@ -397,16 +417,19 @@ export function CreateListingII() {
                         {imageUploadError && imageUploadError}
                     </p>
 
-                    {formData.imageUrls.length > 0 &&
-                        formData.imageUrls.map((url, index) => (
+                    {formData.imgUrl.length > 0 &&
+                        formData.imgUrl.map((url, index) => (
+
+
                             <div
                                 key={url}
+
                                 className='flex justify-between p-3 border items-center'
                             >
                                 <img
-                                    src={url}
-                                    alt='listing image'
-                                    className='w-20 h-20 object-contain rounded-lg'
+                                    src={ require(`../../imges/${url}`) }
+                                    alt="listing image"
+                                    className="w-20 h-20 object-contain rounded-lg"
                                 />
                                 <button
                                     type='button'

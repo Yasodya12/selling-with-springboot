@@ -6,7 +6,7 @@ export function Search() {
 
     const navigate = useNavigate();
     const [sidebardata, setSidebardata] = useState<any>({
-        searchTerm: '',
+        // searchTerm: '',
         type: 'all',
         parking: false,
         furnished: false,
@@ -26,7 +26,7 @@ export function Search() {
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
-        const searchTermFromUrl = urlParams.get('searchTerm');
+        // const searchTermFromUrl = urlParams.get('searchTerm');
         const typeFromUrl = urlParams.get('type');
         const parkingFromUrl = urlParams.get('parking');
         const furnishedFromUrl = urlParams.get('furnished');
@@ -37,7 +37,7 @@ export function Search() {
 
 
         if (
-            searchTermFromUrl ||
+            // searchTermFromUrl ||
             typeFromUrl ||
             parkingFromUrl ||
             furnishedFromUrl ||
@@ -46,7 +46,7 @@ export function Search() {
             orderFromUrl
         ) {
             setSidebardata({
-                searchTerm: searchTermFromUrl || '',
+                // searchTerm: searchTermFromUrl || '',
                 type: typeFromUrl || 'all',
                 parking: parkingFromUrl === 'true' ? true : false,
                 furnished: furnishedFromUrl === 'true' ? true : false,
@@ -60,7 +60,9 @@ export function Search() {
             setLoading(true);
             setShowMore(false);
             const searchQuery = urlParams.toString();
-            const res = await fetch(`http://localhost:4000/server/listing/get/?${searchQuery}`);
+            // const res = await fetch(`http://localhost:8080/bootapp/listing/search?${searchQuery}`);
+            const res = await fetch(`http://localhost:8080/bootapp/listing/search?${searchQuery}`);
+           console.log(searchQuery)
 
             const data = await res.json();
             if (data.length > 8) {
@@ -68,7 +70,7 @@ export function Search() {
             } else {
                 setShowMore(false);
             }
-            setListings(data);
+            setListings(data.data);
             setLoading(false);
         };
 
@@ -134,7 +136,7 @@ export function Search() {
         // @ts-ignore
         urlParams.set('startIndex', startIndex);
         const searchQuery = urlParams.toString();
-        const res = await fetch(`http://localhost:4000/server/listing/get/?${searchQuery}`);
+        const res = await fetch(`http://localhost:8080/bootapp/listing/search?${searchQuery}`);
         const data = await res.json();
         if (data.length < 9) {
             setShowMore(false);

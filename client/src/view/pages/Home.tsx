@@ -6,7 +6,6 @@ import SwiperCore from "swiper";
 import {ListingIteam} from "../components/ListingIteam";
 
 
-// import img from "../../../img/Sample_User_Icon.png";
 
 export function Home() {
 
@@ -14,13 +13,15 @@ export function Home() {
     const [saleListings, setSaleListings] = useState([]);
     const [rentListings, setRentListings] = useState([]);
     SwiperCore.use([Navigation]);
-    console.log(offerListings);
+    console.log("offer listing",offerListings);
+
     useEffect(() => {
         const fetchOfferListings = async () => {
             try {
-                const res = await fetch('http://localhost:4000/server/listing/get?offer=true&limit=4');
+                const res = await fetch(' http://localhost:8080/bootapp/listing/search?searchTerm=&type=all&parking=false&furnished=false&offer=true&sort=created_at&order=desc');
                 const data = await res.json();
-                setOfferListings(data);
+                setOfferListings(data.data);
+                console.log("offer eka")
                 fetchRentListings();
             } catch (error) {
                 console.log(error);
@@ -28,9 +29,10 @@ export function Home() {
         };
         const fetchRentListings = async () => {
             try {
-                const res = await fetch('http://localhost:4000/server/listing/get?type=rent&limit=4');
+                const res = await fetch('http://localhost:8080/bootapp/listing/search?searchTerm=&type=rent&parking=false&furnished=false&offer=false&sort=created_at&order=desc');
                 const data = await res.json();
-                setRentListings(data);
+                console.log("rent eka")
+                setRentListings(data.data);
                 fetchSaleListings();
             } catch (error) {
                 console.log(error);
@@ -39,16 +41,16 @@ export function Home() {
 
         const fetchSaleListings = async () => {
             try {
-                const res = await fetch('http://localhost:4000/server/listing/get?type=sale&limit=4');
+                const res = await fetch('http://localhost:8080/bootapp/listing/search?searchTerm=&type=sale&parking=false&furnished=false&offer=false&sort=created_at&order=desc');
                 const data = await res.json();
-                setSaleListings(data);
+                console.log("sale eka")
+                setSaleListings(data.data);
             } catch (error) {
                 console.log(error)
             }
         };
         fetchOfferListings();
     }, []);
-
 
 
     return (
@@ -61,7 +63,7 @@ export function Home() {
                     place with ease
                 </h1>
                 <div className='text-gray-400 text-xs sm:text-sm'>
-                    Sahand Estate is the best place to find your next perfect place to
+                    Yasodya Estate is the best place to find your next perfect place to
                     live.
                     <br/>
                     We have a wide range of properties for you to choose from.
@@ -76,6 +78,9 @@ export function Home() {
 
             {/* swiper */}
             <Swiper navigation>
+
+
+
                 {offerListings &&
                     offerListings.length > 0 &&
                     offerListings.map((listing) => (
@@ -84,7 +89,7 @@ export function Home() {
                                 style={{
                                     // @ts-ignore
 
-                                    background: `url('${listing.imageUrls[0]}') center no-repeat`,
+                                    background: `url(${require(`../../imges/${listing.imgUrl[0]}`)}) center no-repeat`,
                                     backgroundSize: 'cover',
                                 }}
                                 className='h-[500px]'

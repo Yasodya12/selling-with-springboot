@@ -16,7 +16,8 @@ export function Contact({ listing }) {
         const fetchLandlord = async () => {
             try {
                 // @ts-ignore
-                const res = await fetch(`http://localhost:4000/server/user/${listing.userRef}`);
+                // const res = await fetch(`http://localhost:4000/server/user/${listing.userRef}`);
+                const res = await fetch(` http://localhost:8080/bootapp/contact?id=U002`);
                 const data = await res.json();
                 setLandlord(data);
             } catch (error) {

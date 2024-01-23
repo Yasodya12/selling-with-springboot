@@ -25,14 +25,16 @@ public class UserServiceImpl implements UserService {
 
 
         userDTO.setId(incrementId(userRepo.findTopByOrderByIdDesc().getId()));
+
         System.out.println(userDTO);
 
 
         if (userRepo.existsByUsernmae(userDTO.getUsernmae())){
-            throw new RuntimeException(userDTO.getUsernmae()+" is already exits, please insert a new username");
+            throw new RuntimeException(userDTO.getUsernmae()+"Username is already exits, please insert a new username");
         }
 
         User map = mapper.map(userDTO, User.class);
+
         System.out.println(map);
         userRepo.save(map);
     }
@@ -110,6 +112,12 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException(id+ " User is not available!");
         }
         userRepo.deleteById(id);
+    }
+
+    @Override
+    public UserDTO getUserById(String id) {
+        User user = userRepo.findById(id).get();
+       return mapper.map(user, UserDTO.class);
     }
 
 }

@@ -27,7 +27,7 @@ export default function Profile(){
     const [userListings, setUserListings] = useState([]);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    ;
+
     // useEffect(() => {
     //     if (file) {
     //         handleFileUpload(file);
@@ -126,20 +126,21 @@ export default function Profile(){
     };
 
     const handleShowListings = async () => {
-        try {
-            setShowListingsError(false);
-            const res = await fetch(`http://localhost:4000/server/user/listings/${currentUser._id}`);
-            const data = await res.json();
-            if (data.success === false) {
-                setShowListingsError(true);
-                return;
-            }
-
-            setUserListings(data);
-            console.log(userListings);
-        } catch (error) {
-            setShowListingsError(true);
-        }
+        console.log("current user id ",currentUser);
+        // try {
+        //     setShowListingsError(false);
+        //     const res = await fetch(`http://localhost:4000/server/user/listings/${currentUser._id}`);
+        //     const data = await res.json();
+        //     if (data.success === false) {
+        //         setShowListingsError(true);
+        //         return;
+        //     }
+        //
+        //     setUserListings(data);
+        //     console.log(userListings);
+        // } catch (error) {
+        //     setShowListingsError(true);
+        // }
     };
 
 

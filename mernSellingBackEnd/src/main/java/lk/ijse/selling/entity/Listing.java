@@ -10,9 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
+@ToString
 @Entity
 public class Listing {
     @Id
@@ -27,7 +28,7 @@ public class Listing {
     private boolean furnished;
     private boolean parking;
     private String type;
-    private String offer;
+    private boolean offer;
     @ElementCollection
     private List<String> imgUrl;
     private String userRef;

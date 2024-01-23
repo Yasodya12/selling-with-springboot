@@ -23,7 +23,7 @@ public class ListingDTO {
     private boolean furnished;
     private boolean parking;
     private String type;
-    private String offer;
+    private boolean offer;
     private ArrayList<String> imgUrl;
     private String userRef;
 }
